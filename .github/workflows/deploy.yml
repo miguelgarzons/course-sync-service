@@ -1,0 +1,45 @@
+name: Deploy Django to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: pruebasclassroomsinu
+  REGION: us-central1
+  SERVICE_NAME: django-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: docker build -t gcr.io/pruebasclassroomsinu/django-api:latest .
+
+    - name: Push to Container Registry
+      run: docker push gcr.io/pruebasclassroomsinu/django-api:latest
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy django-api \
+          --image gcr.io/pruebasclassroomsinu/django-api:latest \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8000
