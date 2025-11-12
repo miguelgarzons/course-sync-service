@@ -7,6 +7,8 @@ echo "⌛ Esperando a que la base de datos esté disponible..."
 sleep 5
 
 
+echo "📦 Aplicando migraciones..."
+python manage.py migrate --noinput
 
 echo "✅ Entrypoint completado. Iniciando aplicación..."
 exec "$@"
