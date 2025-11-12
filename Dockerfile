@@ -47,7 +47,7 @@ SHELL ["/bin/bash", "-c"]
 
 ENTRYPOINT ["/bin/bash", "/app/scripts/entrypoint.sh"]
 
-CMD gunicorn registro_calificado.wsgi:application \
+CMD gunicorn course_sync_service.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers ${GUNICORN_WORKERS} \
     --threads ${GUNICORN_THREADS} \
