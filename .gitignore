@@ -46,8 +46,6 @@ htmlcov/
 .pytype/
 .cache/
 
-# ---- Scripts Shell ----
-*.sh
 
 
 
