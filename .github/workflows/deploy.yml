@@ -94,13 +94,7 @@ jobs:
           --platform managed \
           --allow-unauthenticated \
           --port 8000 \
-          --set-env-vars="\
-            ENVIRONMENT=development,\
-            DJANGO_SUPERUSER_USERNAME=${{ vars.DJANGO_SUPERUSER_USERNAME }},\
-            DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }},\
-            DJANGO_SUPERUSER_EMAIL=${{ vars.DJANGO_SUPERUSER_EMAIL }},\
-            SECRET_KEY=${{ secrets.SECRET_KEY }},\
-            DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}\
+          --set-env-vars="ENVIRONMENT=development,DJANGO_SUPERUSER_USERNAME=${{ vars.DJANGO_SUPERUSER_USERNAME }},DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }},DJANGO_SUPERUSER_EMAIL=${{ vars.DJANGO_SUPERUSER_EMAIL }},SECRET_KEY=${{ secrets.SECRET_KEY }},DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}" \
           --max-instances=2 \
           --memory=512Mi
 
