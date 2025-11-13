@@ -93,21 +93,34 @@ def crear_cursos_schema():
         }
     )
 
-def obtener_acta_schema():
+def obtener_cursos_schema():
     return extend_schema(
-        operation_id="obtener_acta",
-        summary="Obtener un programa de posgrado",
-        description="Devuelve un programa de posgrado con la estructura completa de etiquetas dinámicas.",
-        tags=["Actas"],
+        operation_id="obtener_curso",
+        summary="Obtener un curso classroom",
+        description="Devuelve cursos usando el formato de query params de Moodle Web Services.",
+        tags=["Cursos"],
         parameters=[
             OpenApiParameter(
-                name="llave_id",
-                type=str,
+                name="wstoken",
+                type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
-                required=True,
-                description="Identificador único del programa",
-                examples=[OpenApiExample(name="EjemploID", value="LLAVE-5BE573CF")]
-            )
+                description="Token de autenticación de Moodle",
+                required=True
+            ),
+            OpenApiParameter(
+                name="wsfunction",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Función del web service (ej: core_course_create_courses)",
+                required=True
+            ),
+                      OpenApiParameter(
+                name="options[ids][0]",
+                type=OpenApiTypes.INT,  # o STR según necesites
+                location=OpenApiParameter.QUERY,
+                description="Primer ID dentro de options[ids]",
+                required=False
+            ),
         ],
         responses={
             200: OpenApiResponse(response=ActaRetrieveResponseSerializer, description="Programa obtenido exitosamente"),
