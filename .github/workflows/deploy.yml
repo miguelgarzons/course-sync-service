@@ -4,15 +4,65 @@ on:
   push:
     branches:
       - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
 
 env:
   PROJECT_ID: pruebasclassroomsinu
   REGION: us-central1
-  SERVICE_NAME: django-api
+  PYTHON_VERSION: '3.11'
 
 jobs:
-  deploy:
+  # Job para verificar compilación y tests
+  build-and-test:
     runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Check for syntax errors
+      run: |
+        python -m py_compile $(find . -name "*.py" -not -path "./venv/*" -not -path "./.venv/*")
+
+    - name: Run Django checks
+      run: |
+        python manage.py check --deploy
+
+    - name: Run migrations check
+      run: |
+        python manage.py makemigrations --check --dry-run
+
+    - name: Run tests
+      run: |
+        python manage.py test
+      continue-on-error: false
+
+    - name: Build Docker image (test)
+      run: docker build -t test-image:latest .
+
+  # Job para desplegar a desarrollo
+  deploy-develop:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: https://django-api-dev-xxxxxxxxx-uc.a.run.app
     
     steps:
     - name: Checkout code
@@ -30,16 +80,66 @@ jobs:
       run: gcloud auth configure-docker
 
     - name: Build Docker image
-      run: docker build -t gcr.io/pruebasclassroomsinu/django-api:latest .
+      run: docker build -t gcr.io/${{ env.PROJECT_ID }}/django-api-dev:${{ github.sha }} -t gcr.io/${{ env.PROJECT_ID }}/django-api-dev:latest .
 
     - name: Push to Container Registry
-      run: docker push gcr.io/pruebasclassroomsinu/django-api:latest
-
-    - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy django-api \
-          --image gcr.io/pruebasclassroomsinu/django-api:latest \
-          --region us-central1 \
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api-dev:${{ github.sha }}
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api-dev:latest
+
+    - name: Deploy to Cloud Run (Development)
+      run: |
+        gcloud run deploy django-api-dev \
+          --image gcr.io/${{ env.PROJECT_ID }}/django-api-dev:${{ github.sha }} \
+          --region ${{ env.REGION }} \
           --platform managed \
           --allow-unauthenticated \
-          --port 8000
+          --port 8000 \
+          --set-env-vars="ENVIRONMENT=development" \
+          --max-instances=2 \
+          --memory=512Mi
+
+  # Job para desplegar a producción
+  deploy-production:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://django-api-xxxxxxxxx-uc.a.run.app
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: docker build -t gcr.io/${{ env.PROJECT_ID }}/django-api:${{ github.sha }} -t gcr.io/${{ env.PROJECT_ID }}/django-api:latest .
+
+    - name: Push to Container Registry
+      run: |
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api:${{ github.sha }}
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api:latest
+
+    - name: Deploy to Cloud Run (Production)
+      run: |
+        gcloud run deploy django-api \
+          --image gcr.io/${{ env.PROJECT_ID }}/django-api:${{ github.sha }} \
+          --region ${{ env.REGION }} \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8000 \
+          --set-env-vars="ENVIRONMENT=production" \
+          --min-instances=1 \
+          --max-instances=10 \
+          --memory=1Gi
