@@ -12,10 +12,12 @@ THIRD_PARTY_APPS = [
     "django_json_widget",
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
     "corsheaders",
 ]
 
 LOCAL_APPS = [
+    'course_sync_service.app.create_courses'
  
 ]
 

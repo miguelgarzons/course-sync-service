@@ -34,7 +34,7 @@ staticfiles/
 *.seed
 *.tar
 docker-compose.override.yml
-docker-compose.yml
+
 
 # ---- Coverage / Testing ----
 .coverage

@@ -120,8 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://django-api-prod-xxxxxxxxx-uc.a.run.app  # 🔹 Cambia esta URL a la de tu servicio de producción
-
+      url: https://django-api-prod-xxxxxxxxx-uc.a.run.app 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
