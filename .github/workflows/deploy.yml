@@ -55,7 +55,6 @@ jobs:
     - name: Build Docker image (test)
       run: docker build -t test-image:latest .
 
-  # Job para desplegar a desarrollo
   deploy-develop:
     needs: build-and-test
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
@@ -95,11 +94,18 @@ jobs:
           --platform managed \
           --allow-unauthenticated \
           --port 8000 \
-          --set-env-vars="ENVIRONMENT=development" \
+          --set-env-vars="\
+            ENVIRONMENT=development,\
+            DJANGO_SUPERUSER_USERNAME=${{ vars.DJANGO_SUPERUSER_USERNAME }},\
+            DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }},\
+            DJANGO_SUPERUSER_EMAIL=${{ vars.DJANGO_SUPERUSER_EMAIL }},\
+            SECRET_KEY=${{ secrets.SECRET_KEY }},\
+            DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}\
           --max-instances=2 \
           --memory=512Mi
 
-  # Job para desplegar a producción
+
+
   deploy-production:
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
