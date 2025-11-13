@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path(
-        "api/core/",
+        "api/create_courses/",
         include("course_sync_service.app.create_courses.infrastructure.urls"),
     ),
 ]

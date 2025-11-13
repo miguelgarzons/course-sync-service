@@ -1,71 +1,58 @@
 from rest_framework import serializers
-from django.core.validators import validate_email
-from datetime import datetime
+from collections import defaultdict
+import re
 
+class CursoSerializer(serializers.Serializer):
+    fullname = serializers.CharField(max_length=255, required=True)
+    shortname = serializers.CharField(max_length=255, required=True)
+    categoryid = serializers.IntegerField(required=True)
+    startdate = serializers.IntegerField(required=True)
+    enddate = serializers.IntegerField(required=True)
+    visible = serializers.IntegerField(required=True)
 
-class EtiquetasDinamicasSerializer(serializers.Serializer):
-    etiquetas_dinamicas = serializers.DictField()
-
-    def validate(self, data):
-        etiquetas = data.get("etiquetas_dinamicas", {})
-        if "variables" not in etiquetas:
-            raise serializers.ValidationError({"etiquetas_dinamicas": "Debe contener la clave 'variables'."})
-
-        variables = etiquetas.get("variables", {})
-        if not isinstance(variables, dict):
-            raise serializers.ValidationError({"variables": "El valor de 'variables' debe ser un objeto (dict)."})
-
-        errores = {}
-        for nombre, valor in variables.items():
-            error = self._validar_variable(nombre, valor)
-            if error:
-                errores[nombre] = error
-
-        if errores:
-            raise serializers.ValidationError({"variables": errores})
-
-        return data
-
-    def _validar_variable(self, nombre, valor):
+class MoodleQueryParamsSerializer(serializers.Serializer):
+    """
+    Serializer que parsea automáticamente los query params de Moodle.
+    Uso: MoodleQueryParamsSerializer(data=request.query_params)
+    """
+    wstoken = serializers.CharField(required=True)
+    wsfunction = serializers.CharField(required=True)
+    moodlewsrestformat = serializers.CharField(required=True)
+    courses = CursoSerializer(many=True, required=True)
+    
+    def to_internal_value(self, data):
         """
-        Reglas dinámicas de validación según el tipo de dato detectado.
+        Convierte automáticamente courses[0][field] a estructura anidada
+        y maneja campos enteros vacíos.
         """
-        if valor is None or valor == "":
-            return "El campo no puede estar vacío."
-
-        if nombre == "correo_director":
-            try:
-                validate_email(valor)
-            except Exception:
-                return "Debe ser un correo electrónico válido."
-
-        if nombre == "fecha":
-            try:
-                datetime.strptime(valor, "%Y-%m-%d")
-            except Exception:
-                return "La fecha debe tener el formato YYYY-MM-DD."
-
-        if nombre == "viabilidad_financiera" and not isinstance(valor, bool):
-            return "El campo 'viabilidad_financiera' debe ser verdadero o falso (booleano)."
-
-        if nombre in ["busqueda_snies", "duracion_programa", "admitidos_programa"]:
-            if not isinstance(valor, int):
-                return "Debe ser un número entero."
-
-        if nombre == "programas_similares":
-            if not isinstance(valor, list):
-                return "Debe ser una lista de valores (array)."
-            if not all(isinstance(v, str) for v in valor):
-                return "Cada elemento debe ser texto (string)."
-
-        if isinstance(valor, str) and len(valor.strip()) == 0:
-            return "El valor no puede estar vacío o solo contener espacios."
-
-        return None
-
-class ActaQuerySerializer(serializers.Serializer):
-    llave_id = serializers.CharField(
-        required=True,
-        help_text="ID del llave_id que se desea obtener"
-    )
-
+        parsed_data = {
+            'wstoken': data.get('wstoken'),
+            'wsfunction': data.get('wsfunction'),
+            'moodlewsrestformat': data.get('moodlewsrestformat'),
+        }
+        
+        cursos_dict = defaultdict(dict)
+        patron = re.compile(r'courses\[(\d+)\]\[(\w+)\]')
+        
+        for clave, valor in data.items():
+            match = patron.match(clave)
+            if match:
+                indice = int(match.group(1))
+                campo = match.group(2)
+                if campo in ['categoryid', 'startdate', 'enddate', 'visible']:
+                    if valor == '':
+                        raise serializers.ValidationError({campo: 'Este campo es obligatorio y debe ser un número.'})
+                    try:
+                        valor = int(valor)
+                    except ValueError:
+                        raise serializers.ValidationError({campo: f'Valor inválido: {valor}'})
+                elif campo in ['fullname', 'shortname']:
+                    if valor == '':
+                        raise serializers.ValidationError({campo: 'Este campo es obligatorio.'})
+                
+                cursos_dict[indice][campo] = valor
+        parsed_data['courses'] = [
+            cursos_dict[i] for i in sorted(cursos_dict.keys())
+        ]
+        
+        return super().to_internal_value(parsed_data)

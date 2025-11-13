@@ -83,8 +83,14 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Mi API',
+    'TITLE': 'Course Sync Service API',
+    'DESCRIPTION': (
+        "Course Sync Service API es un servicio que actúa como un puente de "
+        "integración entre SINU y Google Classroom, permitiendo la creación, "
+        "actualización y administración automatizada de cursos académicos. "
+        "La API sincroniza información institucional como asignaturas, docentes, "
+        "estudiantes y grupos, para generar aulas virtuales en Classroom de manera "
+        "segura, consistente y sin intervención manual."
+    ),
     'VERSION': '1.0.0',
-   
 }
-

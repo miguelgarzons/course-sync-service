@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import ActaView
+from .views import CreateCourseAPIView
 
 urlpatterns = [
-    path("", ActaView.as_view(), name="Acta_crear"),
+    path("", CreateCourseAPIView.as_view(), name="Acta_crear"),
    
 ]
