@@ -51,6 +51,9 @@ jobs:
     - name: Build Docker image (test)
       run: docker build -t test-image:latest .
 
+  # ========================================
+  # 🚀 DEPLOY TO DEVELOPMENT (develop branch)
+  # ========================================
   deploy-develop:
     needs: build-and-test
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
@@ -84,7 +87,6 @@ jobs:
         docker push gcr.io/${{ env.PROJECT_ID }}/django-api-dev:${{ github.sha }}
         docker push gcr.io/${{ env.PROJECT_ID }}/django-api-dev:latest
 
-    # 🔹 Crear archivo .env dinámicamente desde secrets y environment variables
     - name: Create .env file
       run: |
         echo "DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}" >> .env
@@ -96,8 +98,6 @@ jobs:
         echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}" >> .env
         echo "ENVIRONMENT=development" >> .env
         echo "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}" >> .env
-      # 🔸 Usa `vars.` para variables de entorno (no sensibles)
-      # 🔸 Usa `secrets.` para datos sensibles como contraseñas o llaves secretas
 
     - name: Deploy to Cloud Run (Development)
       run: |
@@ -109,4 +109,64 @@ jobs:
           --port 8000 \
           --env-vars-file .env \
           --max-instances=2 \
+          --memory=512Mi
+
+  # ========================================
+  # 🚀 DEPLOY TO PRODUCTION (main branch)
+  # ========================================
+  deploy-production:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://django-api-prod-xxxxxxxxx-uc.a.run.app  # 🔹 Cambia esta URL a la de tu servicio de producción
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: |
+        docker build -t gcr.io/${{ env.PROJECT_ID }}/django-api-prod:${{ github.sha }} \
+                     -t gcr.io/${{ env.PROJECT_ID }}/django-api-prod:latest .
+
+    - name: Push to Container Registry
+      run: |
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api-prod:${{ github.sha }}
+        docker push gcr.io/${{ env.PROJECT_ID }}/django-api-prod:latest
+
+    - name: Create .env file
+      run: |
+        echo "DJANGO_DEBUG=${{ vars.DJANGO_DEBUG_PROD }}" >> .env
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_PROD }}" >> .env
+        echo "DJANGO_ALLOWED_HOSTS=${{ vars.DJANGO_ALLOWED_HOSTS_PROD }}" >> .env
+        echo "CORS_ALLOWED_ORIGINS=${{ vars.CORS_ALLOWED_ORIGINS_PROD }}" >> .env
+        echo "DJANGO_SUPERUSER_USERNAME=${{ vars.DJANGO_SUPERUSER_USERNAME_PROD }}" >> .env
+        echo "DJANGO_SUPERUSER_EMAIL=${{ vars.DJANGO_SUPERUSER_EMAIL_PROD }}" >> .env
+        echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD_PROD }}" >> .env
+        echo "ENVIRONMENT=production" >> .env
+        echo "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}" >> .env
+
+    - name: Deploy to Cloud Run (Production)
+      run: |
+        gcloud run deploy course-sync-service-prod \
+          --image gcr.io/${{ env.PROJECT_ID }}/django-api-prod:${{ github.sha }} \
+          --region ${{ env.REGION }} \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8000 \
+          --env-vars-file .env \
+          --max-instances=3 \
           --memory=512Mi
