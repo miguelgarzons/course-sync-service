@@ -94,7 +94,7 @@ jobs:
           --platform managed \
           --allow-unauthenticated \
           --port 8000 \
-          --env-vars-file .env
+          --env-vars-file .env\
           --max-instances=2 \
           --memory=512Mi
 
