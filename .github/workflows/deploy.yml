@@ -87,7 +87,7 @@ jobs:
     # 🔹 Crear archivo .env dinámicamente desde secrets y environment variables
     - name: Create .env file
       run: |
-        echo "DEBUG=${{ vars.DJANGO_DEBUG }}" >> .env
+        echo "DJANGO_DEBUG=${{ vars.DJANGO_DEBUG }}" >> .env
         echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
         echo "DJANGO_ALLOWED_HOSTS=${{ vars.DJANGO_ALLOWED_HOSTS }}" >> .env
         echo "CORS_ALLOWED_ORIGINS=${{ vars.CORS_ALLOWED_ORIGINS }}" >> .env
