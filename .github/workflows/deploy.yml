@@ -89,7 +89,7 @@ jobs:
 
     - name: Deploy to Cloud Run (Development)
       run: |
-        gcloud run deploy django-api-dev \
+        gcloud run deploy course-sync-service-dev \
           --image gcr.io/${{ env.PROJECT_ID }}/django-api-dev:${{ github.sha }} \
           --region ${{ env.REGION }} \
           --platform managed \
@@ -133,7 +133,7 @@ jobs:
 
     - name: Deploy to Cloud Run (Production)
       run: |
-        gcloud run deploy django-api \
+        gcloud run deploy course-sync-service-prod \
           --image gcr.io/${{ env.PROJECT_ID }}/django-api:${{ github.sha }} \
           --region ${{ env.REGION }} \
           --platform managed \
