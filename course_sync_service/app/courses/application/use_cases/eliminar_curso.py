@@ -11,7 +11,6 @@ class EliminarCurso:
 
     def ejecutar(self, validated_data) -> Dict[str, Any]:
         entidad = MoodleDeleteMapper.from_validated_data(validated_data)
-
         resultados = []
 
         for course_id in entidad.ids:

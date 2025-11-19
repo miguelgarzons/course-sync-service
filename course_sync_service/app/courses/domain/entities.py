@@ -16,3 +16,8 @@ class Curso:
 @dataclass
 class CursosAEliminar:
     ids: List[int]
+
+
+@dataclass
+class CursosObtener:
+    ids: List[int]

@@ -5,9 +5,5 @@ from course_sync_service.app.courses.infrastructure.container import CourseConta
 
 class ApplicationContainer(containers.DeclarativeContainer):
     """Contenedor global de la aplicación."""
-    
-    # Configuración global (opcional)
     config = providers.Configuration()
-    
-    # Contenedor de Courses
     course = providers.Container(CourseContainer)
