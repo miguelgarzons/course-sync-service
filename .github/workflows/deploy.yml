@@ -98,10 +98,10 @@ jobs:
         echo "DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}" >> .env
         echo "ENVIRONMENT=development" >> .env
         echo "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}" >> .env
-        echo "GOOGLE_ACCESS_TOKEN=${{ env.GOOGLE_ACCESS_TOKEN }}" >> .env
-        echo "GOOGLE_REFRESH_TOKEN=${{ env.GOOGLE_REFRESH_TOKEN }}" >> .env
-        echo "GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}" >> .env
-        echo "GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }}" >> .env
+        echo "GOOGLE_ACCESS_TOKEN=${{ vars.GOOGLE_ACCESS_TOKEN }}" >> .env
+        echo "GOOGLE_REFRESH_TOKEN=${{ vars.GOOGLE_REFRESH_TOKEN }}" >> .env
+        echo "GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}" >> .env
+        echo "GOOGLE_CLIENT_SECRET=${{ vars.GOOGLE_CLIENT_SECRET }}" >> .env
 
     - name: Deploy to Cloud Run (Development)
       run: |
