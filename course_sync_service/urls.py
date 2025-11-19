@@ -8,9 +8,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path(
-        "api/create_courses/",
+        "api/courses/",
         include("course_sync_service.app.courses.infrastructure.urls"),
     ),
+
+
+    path(
+        "api/student/",
+        include("course_sync_service.app.student.infrastructure.urls"),
+    ),
+
 ]
 
 urlpatterns += urlpatterns_scalar

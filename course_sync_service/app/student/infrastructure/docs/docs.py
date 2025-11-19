@@ -5,12 +5,12 @@ from ..out.curso_delete_response_serializer import CursoDeleteResponseSerializer
 from ..out.curso_create_response_serializer import CursoGoogleResponseSerializer
 from drf_spectacular.types import OpenApiTypes
 
-def crear_cursos_schema():
+def crear_estudiantes_schema():
     return extend_schema(
-        operation_id="crear_curso",
-        summary="Crear un curso classroom",
-        description="Crear cursos usando el formato de query params de Moodle Web Services.",
-        tags=["Cursos"],
+        operation_id="matricular_estudiantes",
+        summary="Matricula estudiantes classroom",
+        description="Matricula estudiantes usando el formato de query params de Moodle Web Services.",
+        tags=["Estudiantes"],
         parameters=[
             OpenApiParameter(
                 name="wstoken",
@@ -82,12 +82,12 @@ def crear_cursos_schema():
         }
     )
 
-def obtener_cursos_schema():
+def obtener_estudiantes_schema():
     return extend_schema(
-        operation_id="obtener_curso",
-        summary="Obtener un curso classroom",
-        description="Devuelve cursos usando el formato de query params de Moodle Web Services.",
-        tags=["Cursos"],
+        operation_id="obtener_estudiante",
+        summary="Obtener un estudiante de classroom",
+        description="Devuelve estudiantes usando el formato de query params de Moodle Web Services.",
+        tags=["Estudiantes"],
         parameters=[
             OpenApiParameter(
                 name="wstoken",
@@ -117,12 +117,12 @@ def obtener_cursos_schema():
         }
     )
 
-def eliminar_cursos_schema():
+def eliminar_estudiantes_schema():
     return extend_schema(
-        operation_id="eliminar_curso",
-        summary="Eliminar un curso classroom",
-        description="elimina un curso usando el formato de query params de Moodle Web Services.",
-        tags=["Cursos"],
+        operation_id="eliminar_estudiante",
+        summary="Eliminar un estudiante classroom",
+        description="elimina un estudiante usando el formato de query params de Moodle Web Services.",
+        tags=["Estudiantes"],
         parameters=[
             OpenApiParameter(
                 name="wstoken",
@@ -153,16 +153,16 @@ def eliminar_cursos_schema():
     )
 
 
-def actualizar_cursos_schema():
+def actualizar_estudiantes_schema():
     return extend_schema(
-        operation_id="Actualizar_curso",
-        summary="Actualiza un curso en classroom",
+        operation_id="Actualizar_estudiante",
+        summary="Actualiza un estudiante en classroom",
         description=(
-            "Actualiza un curso usando el formato de query params del Moodle Web Service "
+            "Actualiza un estudiante usando el formato de query params del Moodle Web Service "
             "`core_course_update_courses`. Los parámetros deben enviarse siguiendo la convención:\n"
             "`courses[0][campo] = valor`."
         ),
-        tags=["Cursos"],
+        tags=["Estudiantes"],
         parameters=[
 
             OpenApiParameter(
