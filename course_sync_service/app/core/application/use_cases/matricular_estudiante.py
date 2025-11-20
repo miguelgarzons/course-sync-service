@@ -4,7 +4,7 @@ from course_sync_service.app.courses.application.mappers.curso_moodle_mapper imp
 from course_sync_service.app.courses.application.mappers.curso_google_mapper import CursoGoogleMapper
 
 
-class CrearCurso:
+class MatricularEstudiante :
 
     def __init__(self, google_classroom_client: GoogleClassroomClient):
         self.google_classroom_client = google_classroom_client

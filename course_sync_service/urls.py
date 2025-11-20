@@ -17,6 +17,11 @@ urlpatterns = [
         "api/student/",
         include("course_sync_service.app.student.infrastructure.urls"),
     ),
+    
+    path(
+        "api/core/",
+        include("course_sync_service.app.core.infrastructure.urls"),
+    ),
 
 ]
 

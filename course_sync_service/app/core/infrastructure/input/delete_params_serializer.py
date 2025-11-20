@@ -3,7 +3,7 @@ import re
 from collections import defaultdict
 
 
-class MoodleGetParamsSerializer(serializers.Serializer):
+class MoodleDeleteParamsSerializer(serializers.Serializer):
     wstoken = serializers.CharField(required=True)
     wsfunction = serializers.CharField(required=True)
     options = serializers.DictField(child=serializers.ListSerializer(
@@ -12,10 +12,13 @@ class MoodleGetParamsSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         """
-        Convierte options[ids][0] y similares a una estructura Python.
-        Permite vacío solo en options[ids][0].
+        Convierte options[ids][0] y similares a una estructura Python:
+        {
+            "options": {
+                "ids": [123, 456]
+            }
+        }
         """
-
         parsed_data = {
             'wstoken': data.get('wstoken'),
             'wsfunction': data.get('wsfunction'),
@@ -28,14 +31,11 @@ class MoodleGetParamsSerializer(serializers.Serializer):
         for clave, valor in data.items():
             match = patron.match(clave)
             if match:
-                key = match.group(1)
-                index = int(match.group(2))
+                key = match.group(1)     # "ids"
+                index = int(match.group(2))  # 0,1,2,...
+
                 if valor == '':
-                    if not (key == 'ids' and index == 0):
-                        raise serializers.ValidationError({key: 'El valor no puede estar vacío.'})
-                    while len(options_dict[key]) <= index:
-                        options_dict[key].append(None)
-                    continue
+                    raise serializers.ValidationError({key: 'El valor no puede estar vacío.'})
 
                 try:
                     valor = int(valor)
@@ -46,7 +46,6 @@ class MoodleGetParamsSerializer(serializers.Serializer):
                     options_dict[key].append(None)
 
                 options_dict[key][index] = valor
-
         for key, lista in options_dict.items():
             parsed_data['options'][key] = [x for x in lista if x is not None]
 

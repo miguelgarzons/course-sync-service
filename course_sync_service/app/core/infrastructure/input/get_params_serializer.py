@@ -30,9 +30,12 @@ class MoodleGetParamsSerializer(serializers.Serializer):
             if match:
                 key = match.group(1)
                 index = int(match.group(2))
+
+                # Permitir vacío solo en options[ids][0]
                 if valor == '':
                     if not (key == 'ids' and index == 0):
                         raise serializers.ValidationError({key: 'El valor no puede estar vacío.'})
+                    # simplemente no añadir el valor (queda None)
                     while len(options_dict[key]) <= index:
                         options_dict[key].append(None)
                     continue

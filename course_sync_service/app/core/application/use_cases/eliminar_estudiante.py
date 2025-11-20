@@ -4,7 +4,7 @@ from course_sync_service.app.courses.application.mappers.moodle_delete_mapper im
 from course_sync_service.app.core.integrations.classroom.google_classroom_courses import GoogleClassroomClient
 
 
-class EliminarCurso:
+class EliminarEstudiante:
 
     def __init__(self, google_classroom_client: GoogleClassroomClient):
         self.google_classroom_client = google_classroom_client

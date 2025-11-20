@@ -18,7 +18,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'course_sync_service.app.courses',
-    'course_sync_service.app.student'
+    'course_sync_service.app.student',
+    'course_sync_service.app.core'
  
 ]
 

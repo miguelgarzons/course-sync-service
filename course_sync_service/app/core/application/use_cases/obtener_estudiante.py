@@ -4,7 +4,7 @@ import uuid
 from course_sync_service.app.courses.application.mappers.moodle_get_mapper import MoodleGetMapper
 from course_sync_service.app.core.integrations.classroom.google_classroom_courses import GoogleClassroomClient
 
-class ObtenerCursos:
+class ObtenerEstudiante:
     def __init__(self, google_classroom_client: GoogleClassroomClient):
         self.google_classroom_client = google_classroom_client
 
