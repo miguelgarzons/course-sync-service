@@ -1,4 +1,4 @@
 from course_sync_service.app.shared.container import container
-class CreateStudentStrategy:
+class DeleteCourseStrategy:
     def execute(self, data):
-        return container.course().create().ejecutar(data)
+        return container.course().delete().ejecutar(data)

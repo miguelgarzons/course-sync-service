@@ -8,9 +8,13 @@ from course_sync_service.app.courses.infrastructure.input.serializers import Moo
 output_map = {
     "core_course_create_courses": MoodleQueryParamsSerializer,
     "core_course_delete_courses": MoodleDeleteParamsSerializer,
-    "core_course_update_courses":MoodleGetParamsSerializer,
-    "core_course_get_courses":MoodleGetParamsSerializer,
+    "core_course_update_courses": MoodleGetParamsSerializer,
+    "core_course_get_courses": MoodleGetParamsSerializer,
 }
 
-def input_serializer_for(action):
-    return output_map[action]
+def input_serializer_for(action, data=None):
+    SerializerClass = output_map[action]
+    return SerializerClass(
+        data=data,
+        many=isinstance(data, list)
+    )

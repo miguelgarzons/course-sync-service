@@ -4,9 +4,9 @@ from course_sync_service.app.student.infrastructure.out.curso_get_response_seria
 
 
 output_map = {
-    "create": CursoGoogleResponseSerializer,
-    "delete": CursoDeleteResponseSerializer,
-    "get": CursoGetResponseSerializer,
+    "core_course_create_courses": CursoGoogleResponseSerializer,
+    "core_course_delete_courses": CursoDeleteResponseSerializer,
+    "core_course_get_courses": CursoGetResponseSerializer,
 }
 
 def output_serializer_for(action):
