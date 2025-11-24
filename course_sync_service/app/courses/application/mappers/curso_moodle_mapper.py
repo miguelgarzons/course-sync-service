@@ -1,4 +1,3 @@
-
 from course_sync_service.app.courses.domain.entities import Curso
 
 
@@ -8,14 +7,12 @@ class CursoMoodleMapper:
         cursos = []
         for c in data.get("courses", []):
             cursos.append(Curso(
-                id=c["id"],
-                fullname=c["fullname"],
-                shortname=c["shortname"],
-                categoryid=c["categoryid"],
-                startdate=c["startdate"],
-                enddate=c["enddate"],
-                visible=c["visible"],
+                id=c.get("id"),               
+                fullname=c.get("fullname"),
+                shortname=c.get("shortname"),
+                categoryid=c.get("categoryid"),
+                startdate=c.get("startdate"),
+                enddate=c.get("enddate"),
+                visible=c.get("visible"),
             ))
         return cursos
-    
-    
