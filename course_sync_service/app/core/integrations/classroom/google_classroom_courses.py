@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 from googleapiclient.errors import HttpError
 
 from course_sync_service.app.core.integrations.classroom.google_class_room_base import (
+    GoogleClassroomAPIException,
     GoogleClassroomBase
 )
 
@@ -71,17 +72,29 @@ class GoogleClassroomClient(GoogleClassroomBase):
             self.handle_error(error, "obtener todos los cursos")
 
     def update_course(self, course_id: str, course_data: Dict[str, Any]):
-        logger.info(f"Actualizando curso {course_id}")
+            logger.info(f"Actualizando curso {course_id} con datos: {course_data}")
+            try:
+                update_mask = ",".join(course_data.keys())
 
-        try:
-            update_mask = ",".join(course_data.keys())
-            return self.service.courses().update(
-                id=course_id,
-                updateMask=update_mask,
-                body=course_data
-            ).execute()
-        except HttpError as error:
-            self.handle_error(error, "actualizar curso")
+                return self.service.courses().patch(
+                    id=course_id,
+                    updateMask=update_mask,
+                    body=course_data
+                ).execute()
+            except TypeError as e:
+                if "Missing required parameter" in str(e) and "id" in str(e):
+                    raise GoogleClassroomAPIException(
+                        detail="No se puede actualizar el curso porque el ID es inválido o está ausente.",
+                        code="curso_id_invalido"
+                    )
+                raise e 
+            except HttpError as error:
+                if error.resp.status == 404:
+                    raise GoogleClassroomAPIException(
+                        detail="El curso no existe en Google Classroom y no puede ser actualizado.",
+                        code="curso_no_encontrado"
+                    )
+                self.handle_error(error, "actualizar curso")
 
     def delete_course(self, course_id: str) -> bool:
         logger.info(f"Eliminando curso {course_id}")
@@ -91,7 +104,6 @@ class GoogleClassroomClient(GoogleClassroomBase):
             return True
 
         except HttpError as error:
-            # Caso especial: no se puede eliminar → archivar
             if error.resp.status == 400 and "Precondition check failed" in str(error):
                 try:
                     self.service.courses().patch(
@@ -102,5 +114,4 @@ class GoogleClassroomClient(GoogleClassroomBase):
                     return True
                 except HttpError as error2:
                     self.handle_error(error2, "archivar curso")
-
             self.handle_error(error, "eliminar curso")

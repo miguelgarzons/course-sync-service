@@ -8,6 +8,7 @@ class CursoMoodleMapper:
         cursos = []
         for c in data.get("courses", []):
             cursos.append(Curso(
+                id=c["id"],
                 fullname=c["fullname"],
                 shortname=c["shortname"],
                 categoryid=c["categoryid"],

@@ -1,8 +1,9 @@
 from course_sync_service.app.core.application.strategies.create_course_strategy import CreateCoursetStrategy
 from course_sync_service.app.core.application.strategies.delete_course_strategy import DeleteCourseStrategy
 from course_sync_service.app.core.application.strategies.get_course_strategy import GetCourseStrategy
-
+from course_sync_service.app.core.application.strategies.update_course_strategy import UpdateCourseStrategy
 from rest_framework.exceptions import APIException
+
 
 class StrategyFactory:
 
@@ -10,6 +11,7 @@ class StrategyFactory:
         "core_course_create_courses": CreateCoursetStrategy(),
         "core_course_delete_courses": DeleteCourseStrategy(),
         "core_course_get_courses": GetCourseStrategy(),
+        "core_course_update_courses": UpdateCourseStrategy(),
     }
 
     @classmethod

@@ -40,7 +40,7 @@ class StudentContainer(containers.DeclarativeContainer):
     )
     
     update = providers.Factory(
-        EliminarEstudiante,
+        ActualizarEstudiante,
         google_classroom_client=google_classroom_client
     )
     

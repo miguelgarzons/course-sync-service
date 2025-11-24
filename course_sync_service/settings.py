@@ -92,5 +92,14 @@ SPECTACULAR_SETTINGS = {
         "estudiantes y grupos, para generar aulas virtuales en Classroom de manera "
         "segura, consistente y sin intervención manual."
     ),
+     "TAGS": [
+        {
+            "name": "Core API",
+            "description": (
+                "Grupo de operaciones que interactúan con los Web Services de Moodle. "
+                "Incluye creación, actualización, consulta y eliminación de cursos."
+            ),
+        },
+    ],
     'VERSION': '1.0.0',
 }

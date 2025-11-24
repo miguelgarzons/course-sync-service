@@ -24,7 +24,9 @@ def core_api_post_schema():
             "- `core_course_create_courses`: Crear cursos\n"
             "- `core_course_get_courses`: Obtener cursos\n"
             "- `core_course_update_courses`: Actualizar cursos\n"
-            "- `core_course_delete_courses`: Eliminar cursos\n\n"
+            "- `core_course_delete_courses`: Eliminar cursos\n"
+            "- `enrol_manual_enrol_users`: Matricular usuarios en cursos\n"
+            "- `enrol_manual_unenrol_users`: Desmatricular usuarios de cursos\n\n"
             "Los parámetros adicionales dependen de la operación seleccionada. "
             "Ver ejemplos en la sección de responses."
         ),
@@ -56,7 +58,9 @@ def core_api_post_schema():
                     "core_course_create_courses",
                     "core_course_get_courses",
                     "core_course_update_courses",
-                    "core_course_delete_courses"
+                    "core_course_delete_courses",
+                    "enrol_manual_enrol_users",
+                    "enrol_manual_unenrol_users"
                 ]
             ),
             OpenApiParameter(
@@ -75,7 +79,9 @@ def core_api_post_schema():
                     "**create_courses**: Retorna el curso creado con su ID\n"
                     "**get_courses**: Retorna lista de cursos\n"
                     "**update_courses**: Retorna confirmación de actualización\n"
-                    "**delete_courses**: Retorna confirmación de eliminación"
+                    "**delete_courses**: Retorna confirmación de eliminación\n"
+                    "**enrol_manual_enrol_users**: Retorna confirmación de matriculación\n"
+                    "**enrol_manual_unenrol_users**: Retorna confirmación de desmatriculación"
                 )
             ),
             400: OpenApiResponse(
@@ -104,6 +110,27 @@ def core_api_post_schema():
                     "wstoken": "abc123",
                     "wsfunction": "core_course_get_courses",
                     "options[ids][0]": "123"
+                }
+            ),
+            OpenApiExample(
+                name="Matricular usuario",
+                description="Ejemplo de matriculación de usuario en un curso",
+                value={
+                    "wstoken": "abc123",
+                    "wsfunction": "enrol_manual_enrol_users",
+                    "enrolments[0][roleid]": "5",
+                    "enrolments[0][userid]": "42",
+                    "enrolments[0][courseid]": "123"
+                }
+            ),
+            OpenApiExample(
+                name="Desmatricular usuario",
+                description="Ejemplo de desmatriculación de usuario de un curso",
+                value={
+                    "wstoken": "abc123",
+                    "wsfunction": "enrol_manual_unenrol_users",
+                    "enrolments[0][userid]": "42",
+                    "enrolments[0][courseid]": "123"
                 }
             )
         ]
