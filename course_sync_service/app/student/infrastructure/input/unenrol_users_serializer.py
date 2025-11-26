@@ -3,17 +3,26 @@ from collections import defaultdict
 import re
 
 class EnrolmentSerializer(serializers.Serializer):
+    """
+    Serializador de un solo enrolment/unenrolment.
+    roleid es opcional porque Moodle no lo usa en unenrol_manual_unenrol_users.
+    """
     userid = serializers.IntegerField(required=True)
     courseid = serializers.IntegerField(required=True)
-    roleid = serializers.IntegerField(required=True)
+    roleid = serializers.IntegerField(required=False)  # opcional para unenrol
 
 
-class MoodleEnrolmentParamsSerializer(serializers.Serializer):
+class MoodleUnenrolmentParamsSerializer(serializers.Serializer):
     """
-    Parser automático para parámetros Moodle tipo:
+    Parser automático para parámetros Moodle como:
+
     enrolments[0][userid]=111
     enrolments[0][courseid]=222
-    enrolments[0][roleid]=5
+    enrolments[0][roleid]=5   ← solo en enrol
+
+    Soporta:
+    - enrol_manual_enrol_users
+    - enrol_manual_unenrol_users
     """
     wstoken = serializers.CharField(required=True)
     wsfunction = serializers.CharField(required=True)
@@ -28,7 +37,6 @@ class MoodleEnrolmentParamsSerializer(serializers.Serializer):
             'moodlewsrestformat': data.get('moodlewsrestformat', 'json'),
         }
 
-        # Acumula enrolments por índice: enrolments[0] enrolments[1]...
         enrolments_dict = defaultdict(dict)
 
         patron = re.compile(r'enrolments\[(\d+)\]\[(\w+)\]')
@@ -39,7 +47,7 @@ class MoodleEnrolmentParamsSerializer(serializers.Serializer):
                 index = int(match.group(1))
                 field = match.group(2)
 
-                # Validación general para campos numéricos
+                # Validación de campos numéricos
                 if field in ['userid', 'courseid', 'roleid']:
                     if valor in ('', None):
                         raise serializers.ValidationError({

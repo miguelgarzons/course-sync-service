@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from course_sync_service.app.core.infrastructure.docs.docs import core_api_post_schema
-
 from course_sync_service.app.core.application.factory.strategy_factory import StrategyFactory
 from course_sync_service.app.core.infrastructure.out.serializers_map import output_serializer_for
 from course_sync_service.app.core.infrastructure.input.serializers_map import input_serializer_for

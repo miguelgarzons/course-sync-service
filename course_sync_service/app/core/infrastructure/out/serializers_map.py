@@ -9,6 +9,8 @@ output_map = {
     "core_course_delete_courses": CursoDeleteResponseSerializer,
     "core_course_get_courses": CursoGetResponseSerializer,
     "core_course_update_courses": CursoUpdateResponseSerializer,
+    "enrol_manual_enrol_users": CursoUpdateResponseSerializer,
+    "enrol_manual_unenrol_users": CursoUpdateResponseSerializer,
 }
 
 def output_serializer_for(action):
