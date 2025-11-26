@@ -16,5 +16,5 @@ class CoreAPIView(APIView):
             strategy = StrategyFactory.get_strategy(action)
             result = strategy.execute(serializer.validated_data)
             response_serializer = output_serializer_for(action)(result,many=isinstance(result, list))
-            return Response({"status": "success", "data": response_serializer.data})
+            return Response([response_serializer.data])
         return Response({"errors": serializer.errors}, status=400)
