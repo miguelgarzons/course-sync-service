@@ -13,6 +13,10 @@ class CustomFieldSerializer(serializers.Serializer):
     valueraw = serializers.CharField(allow_blank=True)
     value = serializers.CharField(allow_blank=True, allow_null=True)
 
+class CursoListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        items = super().to_representation(data)
+        return items  
 
 class CursoGetResponseSerializer(serializers.Serializer):
     id = serializers.CharField()
@@ -49,3 +53,6 @@ class CursoGetResponseSerializer(serializers.Serializer):
 
     showactivitydates = serializers.CharField()
     showcompletionconditions = serializers.CharField()
+    class Meta:
+        list_serializer_class = CursoListSerializer
+

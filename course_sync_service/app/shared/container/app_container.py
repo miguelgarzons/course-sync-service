@@ -16,5 +16,5 @@ class ApplicationContainer(containers.DeclarativeContainer):
     )
     student = providers.Container(
         StudentContainer,
-        google_classroom_client=shared.google_classroom_client
+        google_workspace_client=shared.google_workspace_client
     )
