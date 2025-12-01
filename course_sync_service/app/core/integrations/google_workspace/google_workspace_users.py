@@ -1,20 +1,28 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-
+from google.oauth2 import service_account
 
 class GoogleWorkspaceUsers:
-    def __init__(self, credentials: Credentials):
+    def __init__(self, credentials):
         self.credentials = credentials
-        self._ensure_valid_credentials()
         self.service = build('admin', 'directory_v1', credentials=self.credentials)
 
     def _ensure_valid_credentials(self):
-        """Asegura que las credenciales sean válidas, refrescándolas si es necesario"""
-        if not self.credentials.valid:
-            if self.credentials.expired and self.credentials.refresh_token:
+        """
+        Asegura que las credenciales sean válidas.
+        Para Service Account credentials, no es necesario refrescar manualmente.
+        """
+        # Las credenciales de Service Account se refrescan automáticamente
+        # cuando son necesarias por la biblioteca de Google
+        if isinstance(self.credentials, service_account.Credentials):
+            # Service Account credentials no requieren refresh manual
+            return
+        
+        # Solo para credenciales OAuth2 de usuario (si alguna vez las usas)
+        if hasattr(self.credentials, 'expired') and self.credentials.expired:
+            if hasattr(self.credentials, 'refresh_token') and self.credentials.refresh_token:
                 try:
+                    from google.auth.transport.requests import Request
                     self.credentials.refresh(Request())
                 except Exception as e:
                     raise Exception(f"Error al refrescar credenciales de Google: {str(e)}")
@@ -38,19 +46,16 @@ class GoogleWorkspaceUsers:
             raise ValueError("El email no puede estar vacío")
         
         try:
-            # Refrescar credenciales antes de cada llamada si es necesario
-            self._ensure_valid_credentials()
-            
-            # Intentar obtener el usuario
+            # Para Service Account, no necesitamos refrescar manualmente
             self.service.users().get(userKey=email).execute()
             return True
-            
         except HttpError as e:
             if e.resp.status == 404:
-                # Usuario no encontrado
                 return False
             elif e.resp.status == 403:
-                raise Exception(f"Acceso denegado. Verifica que la cuenta de servicio tenga permisos de Admin SDK: {str(e)}")
+                raise Exception(
+                    f"Acceso denegado. Verifica que la cuenta de servicio tenga permisos de Admin SDK: {str(e)}"
+                )
             else:
                 raise Exception(f"Error al verificar usuario en Google Workspace: {str(e)}")
         except Exception as e:
@@ -70,7 +75,6 @@ class GoogleWorkspaceUsers:
             raise ValueError("El email no puede estar vacío")
         
         try:
-            self._ensure_valid_credentials()
             user = self.service.users().get(userKey=email).execute()
             return user
         except HttpError as e:
@@ -84,21 +88,20 @@ class GoogleWorkspaceUsers:
         
         Args:
             user_data: Diccionario con los datos del usuario
-                Ejemplo:
-                {
-                    'primaryEmail': 'usuario@dominio.com',
-                    'name': {
-                        'givenName': 'Juan',
-                        'familyName': 'Pérez'
-                    },
-                    'password': 'ContraseñaSegura123!'
-                }
-        
+            Ejemplo:
+            {
+                'primaryEmail': 'usuario@dominio.com',
+                'name': {
+                    'givenName': 'Juan',
+                    'familyName': 'Pérez'
+                },
+                'password': 'ContraseñaSegura123!'
+            }
+            
         Returns:
             Diccionario con los datos del usuario creado
         """
         try:
-            self._ensure_valid_credentials()
             user = self.service.users().insert(body=user_data).execute()
             return user
         except HttpError as e:
@@ -116,7 +119,6 @@ class GoogleWorkspaceUsers:
             Lista de usuarios
         """
         try:
-            self._ensure_valid_credentials()
             results = self.service.users().list(
                 customer='my_customer',
                 maxResults=max_results,
@@ -139,7 +141,6 @@ class GoogleWorkspaceUsers:
             Diccionario con los datos del usuario actualizado
         """
         try:
-            self._ensure_valid_credentials()
             user = self.service.users().update(
                 userKey=email,
                 body=user_data
@@ -156,7 +157,6 @@ class GoogleWorkspaceUsers:
             email: Email del usuario a eliminar
         """
         try:
-            self._ensure_valid_credentials()
             self.service.users().delete(userKey=email).execute()
             return True
         except HttpError as e:
