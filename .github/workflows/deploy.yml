@@ -102,6 +102,7 @@ jobs:
         echo "GOOGLE_REFRESH_TOKEN=${{ vars.GOOGLE_REFRESH_TOKEN }}" >> .env
         echo "GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}" >> .env
         echo "GOOGLE_CLIENT_SECRET=${{ vars.GOOGLE_CLIENT_SECRET }}" >> .env
+        echo "GOOGLE_IMPERSONATE_ADMIN=${{ vars.GOOGLE_IMPERSONATE_ADMIN }}" >> .env
 
     - name: Deploy to Cloud Run (Development)
       run: |
